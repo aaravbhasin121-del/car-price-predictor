@@ -14,7 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-model = joblib.load("car_price_model.pkl")
+model = joblib.load("backend/car_price_model.pkl")
 
 class CarInput(BaseModel):
     brand: int
