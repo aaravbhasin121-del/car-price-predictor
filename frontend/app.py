@@ -295,7 +295,7 @@ if predict_btn:
                 "owner": owner,
                 "fuel_type": fuel_type
             }
-response = requests.post("https://your-backend-name.onrender.com/predict", json=payload)
+            response = requests.post("https://your-backend-name.onrender.com/predict", json=payload)
             result = response.json()
             price = int(result['predicted_price'])
             st.session_state.last_price = price
