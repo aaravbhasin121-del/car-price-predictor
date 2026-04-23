@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEMPESTA AI - Used Car Valuation Engine</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- ====== TEMPESTA AI SPLASH SCREEN ====== -->
+    <div id="splashScreen">
+        <canvas id="splashCanvas"></canvas>
+        <div class="splash-content">
+            <div class="splash-logo" id="splashLogo">
+                <span class="splash-t">T</span><span class="splash-rest">EMPESTA</span>
+            </div>
+            <div class="splash-ai" id="splashAI">AI</div>
+            <div class="splash-words" id="splashWords">
+                <span class="splash-word" id="word1">SPEED</span>
+                <span class="splash-word-dot">.</span>
+                <span class="splash-word" id="word2">PRECISION</span>
+                <span class="splash-word-dot">.</span>
+                <span class="splash-word" id="word3">VALUE</span>
+            </div>
+            <div class="splash-loader" id="splashLoader">
+                <div class="splash-loader-bar" id="splashLoaderBar"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1 class="main-title">TEMPESTA AI</h1>
+            <div class="sub-title">Used Car Valuation Engine</div>
+            <div class="tags-container">
+                <span class="tag">Random Forest</span>
+                <span class="tag">RMSE: 814365</span>
+                <span class="tag">R2: 0.74</span>
+            </div>
+        </header>
+
+        <!-- Input Card -->
+        <section class="card input-card">
+            <div class="card-title">Vehicle Details</div>
+            
+            <div class="form-grid">
+                <div class="form-group brand-group">
+                    <label for="brand">Brand</label>
+                    <select id="brand">
+                        <option value="Maruti Suzuki">Maruti Suzuki</option>
+                        <option value="Hyundai">Hyundai</option>
+                        <option value="Honda">Honda</option>
+                        <option value="Toyota">Toyota</option>
+                        <option value="Volkswagen">Volkswagen</option>
+                        <option value="Ford">Ford</option>
+                        <option value="Tata">Tata</option>
+                        <option value="Mahindra">Mahindra</option>
+                        <option value="Renault">Renault</option>
+                        <option value="Kia">Kia</option>
+                        <option value="BMW">BMW</option>
+                        <option value="Mercedes">Mercedes</option>
+                        <option value="Audi">Audi</option>
+                    </select>
+                </div>
+                <div class="brand-logo-container">
+                    <img id="brandLogo" src="https://www.carlogos.org/car-logos/maruti-suzuki-logo.png" alt="Brand Logo">
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age of Car (years)</label>
+                    <input type="number" id="age" min="0" max="30" value="5">
+                </div>
+                
+                <div class="form-group">
+                    <label for="km_driven">KM Driven</label>
+                    <input type="number" id="km_driven" min="0" value="50000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="transmission">Transmission</label>
+                    <select id="transmission">
+                        <option value="Manual">Manual</option>
+                        <option value="Automatic">Automatic</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="owner">Owner Type</label>
+                    <select id="owner">
+                        <option value="First">First</option>
+                        <option value="Second">Second</option>
+                        <option value="Third">Third</option>
+                        <option value="Fourth & Above">Fourth & Above</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fuel">Fuel Type</label>
+                    <select id="fuel">
+                        <option value="Petrol">Petrol</option>
+                        <option value="Diesel">Diesel</option>
+                        <option value="CNG">CNG</option>
+                        <option value="Electric">Electric</option>
+                        <option value="LPG">LPG</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Metrics -->
+            <div class="metric-row">
+                <div class="metric-box">
+                    <div class="metric-label">Brand</div>
+                    <div class="metric-value" id="metricBrand">Maruti</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Age</div>
+                    <div class="metric-value" id="metricAge">5 yrs</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">KM</div>
+                    <div class="metric-value" id="metricKM">50,000</div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="button-row">
+                <button id="predictBtn" class="primary-btn">ESTIMATE PRICE</button>
+                <button id="resetBtn" class="secondary-btn">RESET</button>
+            </div>
+            <div id="loading" class="hidden">Calculating market value...</div>
+            <div id="errorMsg" class="error hidden">Cannot connect to API. Make sure backend is running.</div>
+        </section>
+
+        <!-- Results Section (Hidden initially) -->
+        <section id="resultsSection" class="hidden">
+            <div class="result-box">
+                <div class="result-label">Estimated Resale Price</div>
+                <div class="result-value" id="resultPrice">Rs.0</div>
+                <div class="result-unit">INDIAN RUPEES</div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-box">
+                    <div class="card-title">Price Range Gauge</div>
+                    <canvas id="gaugeChart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <div class="card-title">Feature Impact on Price</div>
+                    <canvas id="impactChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Market Value Journey -->
+            <div class="chart-box" style="margin-bottom: 2rem;">
+                <div class="card-title">Market Value Journey (History & Forecast)</div>
+                <canvas id="journeyChart" style="max-height: 400px;"></canvas>
+            </div>
+
+            <div class="button-row centered">
+                <button id="emiToggleBtn" class="primary-btn">CALCULATE EMI</button>
+            </div>
+
+            <!-- EMI Calculator (Hidden initially) -->
+            <div id="emiSection" class="card hidden">
+                <div class="card-title">EMI Calculator</div>
+                
+                <div class="form-grid emi-grid">
+                    <div class="form-group">
+                        <label for="downPayment">Down Payment (Rs)</label>
+                        <input type="number" id="downPayment" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="interestRate">Interest Rate (%) : <span id="interestRateVal">8.5</span></label>
+                        <input type="range" id="interestRate" min="5.0" max="20.0" step="0.1" value="8.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="tenure">Tenure (months) : <span id="tenureVal">36</span></label>
+                        <input type="range" id="tenure" min="12" max="84" step="6" value="36">
+                    </div>
+                </div>
+
+                <div class="emi-box">
+                    <div class="emi-label">Monthly EMI</div>
+                    <div class="emi-value" id="emiResult">Rs.0</div>
+                    <div class="emi-unit" id="emiUnit">PER MONTH FOR 36 MONTHS</div>
+                </div>
+
+                <div class="metric-row">
+                    <div class="metric-box">
+                        <div class="metric-label">Loan Amount</div>
+                        <div class="metric-value" id="loanAmountResult">Rs.0</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Total Interest</div>
+                        <div class="metric-value" id="totalInterestResult">Rs.0</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Total Payment</div>
+                        <div class="metric-value" id="totalPaymentResult">Rs.0</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Prediction History (Hidden initially) -->
+        <section id="historySection" class="card hidden">
+            <div class="card-title">PREDICTION HISTORY</div>
+            <div class="chart-box history-chart-box">
+                <canvas id="historyChart"></canvas>
+            </div>
+            
+            <div class="table-container">
+                <table id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Brand</th>
+                            <th>Age</th>
+                            <th>KM</th>
+                            <th>Price (Rs)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Main Logic -->
+    <script type="module" src="main.js"></script>
+</body>
+</html>
